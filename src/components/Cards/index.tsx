@@ -1,9 +1,11 @@
 import { Text, Pressable, StyleSheet} from 'react-native';
+import {CaterogiesProps} from '../../types/homeCard.type';
 
-export function Cards({category} : {category: string} ){
+
+export function Cards({data} : {data: CaterogiesProps} ){
     return( 
        <Pressable style={styles.container}>
-            <Text style={{color: "#fff", fontSize: 16}}>{category}</Text>
+            <Text style={{color: "#fff", fontSize: 16}}>{data.name}</Text>
        </Pressable>
     )
 }

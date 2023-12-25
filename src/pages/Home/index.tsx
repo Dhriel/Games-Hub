@@ -5,26 +5,69 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 
 import {Cards} from '../../components/Cards';
-import { GameCard } from '../../components/GameCard';
+import {GameCard } from '../../components/GameCard';
 
-type ListProps = {
-    id: string;
-    category: string;
-}
+import {CardProps, CaterogiesProps} from '../../types/homeCard.type';
 
-const list: ListProps[] = [
-    { id: '1', category: 'All Games' },
-    { id: '2', category: 'Arcade' },
-    { id: '3', category: 'Action' },
-    { id: '4', category: 'Sports' },
-    { id: '5', category: 'Adventure' },
-    { id: '6', category: 'Indie' },
-    { id: '7', category: 'Art' },
-    { id: '8', category: 'Romance' },
-    { id: '9', category: 'School' },
-  ];
+import api from '../../services/api';
 
 export function Home(){
+    const [gameList , setGameList] = useState<CardProps[] | undefined>([]);
+    const [caterogyList , setCategoryList] = useState<CaterogiesProps[] | undefined>([]);
+    const [loading, setLoading] = useState(false);
+
+    useEffect(()=>{
+
+        fetchGames();
+        fetchCategories();
+        
+      }, []);
+
+      async function fetchGames(){
+        try{
+            const response = await api.get(`games?page_size=10&key=9234ee884c68423db619251811fb709b`);
+            let list = [] as CardProps[];
+            response.data.results.forEach((item : any)=>{
+                list.push({
+                    name: item?.name,
+                    rating: item?.rating,
+                    url: item?.background_image,
+                    slug: item?.slug,
+                    id: item?.id
+                });
+                
+            })
+            setGameList(list);
+        }catch(err){
+            console.log(err)
+        }
+    }
+
+    async function fetchCategories(){
+        
+        try {
+            setLoading(true);
+            const response = await api.get(`genres?key=9234ee884c68423db619251811fb709b`);
+            let list = [] as CaterogiesProps[]
+                response.data.results.forEach((item: any)=> {
+                    list.push({
+                        id: item?.id,
+                        name: item?.name
+                    })
+
+                })
+
+                setCategoryList(list);
+
+        }catch(err){
+            console.log(err);
+        }finally{
+            setLoading(false);
+        }
+
+    }
+    
+
     const [input, setInput] = useState('');
     return(
         <SafeAreaView style={styles.container}>
@@ -52,25 +95,22 @@ export function Home(){
 
             {/* Categorias */}
             <View>
-
-            <FlatList
-                data={list}
-                keyExtractor={item => item.id}
-                renderItem={({item}) => (<Cards category={item.category}/>)}
-                showsHorizontalScrollIndicator={false}
-                horizontal
-                style={{flexGrow: 0, marginBottom: 15}}
-                
-                />
+                <FlatList
+                    data={caterogyList}
+                    keyExtractor={item => item.id}
+                    renderItem={({item}) => (<Cards data={item}/>)}
+                    showsHorizontalScrollIndicator={false}
+                    horizontal
+                    style={{flexGrow: 0, marginBottom: 10}}
+                    
+                    />
             </View>
             
             {/* Componente de Games */}
-
-
                 <FlatList
-                    data={list}
+                    data={gameList}
                     keyExtractor={item => item.id}
-                    renderItem={({item}) => (<GameCard category={item.category}/>)}
+                    renderItem={({item}) => (<GameCard data={item}/>)}
                     style={{marginTop: 10,}}
                     ListHeaderComponent={
                         <Text style={{fontSize: 30, fontWeight: 'bold', color:"#fff"}}>Trending Games</Text>
