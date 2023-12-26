@@ -2,11 +2,20 @@ import {View, Text, Pressable, Image, StyleSheet} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {CardProps} from '../../types/homeCard.type';
 
-
+import {NavigationAction, useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import {StackParamsList} from '../../routes';
 
 export function GameCard({data} : {data: CardProps}){
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
+
+
     return(
-        <View style={styles.container}> 
+        <Pressable style={styles.container} 
+            onPress={()=>{
+                navigation.navigate('Detail', {slug: data.slug});
+            }}
+        > 
                 <Image 
                     source={{uri: data.url}}
                     style={styles.gameImage}
@@ -19,7 +28,7 @@ export function GameCard({data} : {data: CardProps}){
                 </View>
             </View>
            <View style={styles.overlay} />
-        </View>
+        </Pressable>
     )
 }
 

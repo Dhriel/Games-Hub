@@ -1,12 +1,11 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList} from 'react-native';
+import {View, Text, StyleSheet, TextInput, FlatList, ActivityIndicator} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Feather';
 
 import {Cards} from '../../components/Cards';
 import {GameCard } from '../../components/GameCard';
-
 import {CardProps, CaterogiesProps} from '../../types/homeCard.type';
 
 import api from '../../services/api';
@@ -15,6 +14,7 @@ export function Home(){
     const [gameList , setGameList] = useState<CardProps[] | undefined>([]);
     const [caterogyList , setCategoryList] = useState<CaterogiesProps[] | undefined>([]);
     const [loading, setLoading] = useState(false);
+    const [input, setInput] = useState('');
 
     useEffect(()=>{
 
@@ -25,6 +25,7 @@ export function Home(){
 
       async function fetchGames(){
         try{
+            setLoading(true);
             const response = await api.get(`games?page_size=10&key=9234ee884c68423db619251811fb709b`);
             let list = [] as CardProps[];
             response.data.results.forEach((item : any)=>{
@@ -40,13 +41,14 @@ export function Home(){
             setGameList(list);
         }catch(err){
             console.log(err)
+        }finally{
+            setLoading(false);
         }
     }
 
     async function fetchCategories(){
         
         try {
-            setLoading(true);
             const response = await api.get(`genres?key=9234ee884c68423db619251811fb709b`);
             let list = [] as CaterogiesProps[]
                 response.data.results.forEach((item: any)=> {
@@ -62,19 +64,27 @@ export function Home(){
         }catch(err){
             console.log(err);
         }finally{
-            setLoading(false);
         }
 
     }
     
+    if(loading) {
+        return(
+            <View style={{
+                flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: "#050B18", marginBottom: 10
+            }}>
+                <Text style={styles.logoTitle}>Games<Text style={{color: '#2c8eff'}}>HUB</Text></Text>
+                <ActivityIndicator size='large' color='#2c8eff'/>
+            </View>
+        )
+    }
 
-    const [input, setInput] = useState('');
     return(
         <SafeAreaView style={styles.container}>
             {/* Parte da Logo e do Icon BookMark */}
             <View style={styles.logoContainer}>
                 <Text style={styles.logoTitle}>Games<Text style={{color: '#2c8eff'}}>HUB</Text></Text>
-                <View style={styles.saveArea}>
+                <View style={styles.iconArea}>
                     <Icon name='bookmark' size={25} color={"#fff"} />
                 </View>
             </View>
@@ -103,7 +113,7 @@ export function Home(){
                     horizontal
                     style={{flexGrow: 0, marginBottom: 10}}
                     
-                    />
+                />
             </View>
             
             {/* Componente de Games */}
@@ -125,15 +135,15 @@ const styles = StyleSheet.create({
     container:{
         flex: 1, 
         backgroundColor:"#050B18",
-        paddingHorizontal: 10
+        paddingHorizontal: 10,
+        paddingTop: 20,
     },
     logoContainer:{
         display: 'flex',
         flexDirection: 'row',
         alignItems: "center",
-        paddingTop: 20,
         justifyContent: 'space-between',
-        marginBottom: 20
+        marginBottom: 15
     },
     logoTitle: {
         fontSize: 30,
@@ -141,7 +151,7 @@ const styles = StyleSheet.create({
         fontFamily: 'Roboto',
         color: "#Fff",
     },
-    saveArea:{
+    iconArea:{
         padding: 14,
         backgroundColor: "#1F2430",
         borderRadius: 30

@@ -10,7 +10,7 @@ export type StackParamsList = {
     Home: undefined,
     Categorys: undefined,
     Favorites: undefined,
-    Detail: undefined,
+    Detail: {slug: string},
 }
 
 const Stack  = createNativeStackNavigator<StackParamsList>();
@@ -22,9 +22,11 @@ export function Routes(){
             <Stack.Screen name='Home' component={Home}
                 options={{headerShown: false}}
             />
+            <Stack.Screen name='Detail' component={Detail}
+                options={{headerShown: false}}
+            />
             <Stack.Screen name='Categorys' component={Categorys}/>
             <Stack.Screen name='Favorites' component={Favorites}/>
-            <Stack.Screen name='Detail' component={Detail}/>
         </Stack.Navigator>
     )
 }
