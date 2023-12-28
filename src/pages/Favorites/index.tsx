@@ -17,13 +17,12 @@ export function Favorites(){
 
     useEffect(()=>{
         fetchGames();
-    },[gameList])
+    },[]);
 
     async function fetchGames(){
        const list = await getItem();
         
         setGameList(list);
-        console.log(list);
     }
 
     return(
@@ -38,7 +37,7 @@ export function Favorites(){
             <FlatList
                     data={gameList}
                     keyExtractor={item => item.id}
-                    renderItem={({item}) => (<GameCard data={item} buttonActive={true}/>)}
+                    renderItem={({item}) => (<GameCard data={item} buttonActive={true} refreshPage={fetchGames}/>)}
                     style={{marginTop: 10,}}
             />
         </View>

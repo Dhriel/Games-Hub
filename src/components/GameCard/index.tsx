@@ -12,16 +12,19 @@ import useStorage from '../../hooks/useStorage';
 interface GameCardProps {
     data : CardProps,
     buttonActive?: boolean;
+    refreshPage?: () => void;
 }
 
 
-export function GameCard({data, buttonActive} : GameCardProps){
+export function GameCard({data, buttonActive, refreshPage} : GameCardProps){
     const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
     const {deleteItem} = useStorage();
 
     async function handleDelete(){
         await deleteItem(data);
-        navigation.navigate('Favorites');
+        if(refreshPage){
+            refreshPage();
+        }
 
     }
 

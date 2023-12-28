@@ -7,7 +7,7 @@ import Icon2 from 'react-native-vector-icons/MaterialIcons'
 
 import {GameDetailsProps, PlatformStoresProps, CardProps} from '../../types/homeCard.type';
 
-import {RouteProp, useRoute, useNavigation} from '@react-navigation/native';
+import {RouteProp, useRoute, useNavigation, useIsFocused} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StackParamsList} from '../../routes/index';
 
@@ -32,6 +32,7 @@ const WidthScreen = Dimensions.get('window').width;
 export function Detail(){
     const route = useRoute<DetailRoutePros>();
     const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
+    const isFocused = useIsFocused();
     
     const [gameList, setGameList] = useState<GameDetailsProps>();
     const [modalVisible, setModalVisible] = useState(false);
@@ -43,7 +44,7 @@ export function Detail(){
 
         fetchGame();
 
-    },[])
+    },[isFocused])
 
     async function fetchGame(){
         setLoading(true);
