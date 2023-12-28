@@ -1,14 +1,29 @@
-import {View, Text, Pressable, Image, StyleSheet} from 'react-native';
+import {View, Text, Pressable, Image, StyleSheet, TouchableOpacity} from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import Icon2 from 'react-native-vector-icons/Feather';
 import {CardProps} from '../../types/homeCard.type';
 
-import {NavigationAction, useNavigation} from '@react-navigation/native';
+import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import {StackParamsList} from '../../routes';
 
-export function GameCard({data} : {data: CardProps}){
-    const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
+import useStorage from '../../hooks/useStorage';
 
+interface GameCardProps {
+    data : CardProps,
+    buttonActive?: boolean;
+}
+
+
+export function GameCard({data, buttonActive} : GameCardProps){
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
+    const {deleteItem} = useStorage();
+
+    async function handleDelete(){
+        await deleteItem(data);
+        navigation.navigate('Favorites');
+
+    }
 
     return(
         <Pressable style={styles.container} 
@@ -16,10 +31,12 @@ export function GameCard({data} : {data: CardProps}){
                 navigation.navigate('Detail', {slug: data.slug});
             }}
         > 
+               {data.url && data.url != null && (
                 <Image 
                     source={{uri: data.url}}
                     style={styles.gameImage}
                 />
+               )}
            <View style={styles.infoArea}>
                 <Text style={styles.title}>{data.name}</Text>
                 <View style={{flexDirection: 'row', alignItems: "center"}}>
@@ -28,6 +45,11 @@ export function GameCard({data} : {data: CardProps}){
                 </View>
             </View>
            <View style={styles.overlay} />
+            {buttonActive && (
+                <TouchableOpacity style={styles.iconArea} onPress={handleDelete}>
+                <   Icon2 name='trash' size={25} color={"#fff"} />
+                </TouchableOpacity>
+            )}
         </Pressable>
     )
 }
@@ -60,4 +82,13 @@ const styles  = StyleSheet.create({
         ...StyleSheet.absoluteFillObject,
         backgroundColor: 'rgba(0, 0, 0, 0.315)', // Altere o valor do último número para aumentar ou diminuir a opacidade
       },
+      iconArea:{
+        padding: 14,
+        backgroundColor: "#E72F49",
+        borderRadius: 30,
+        position: 'absolute',
+        top: 10,
+        right: 10,
+
+    },
 })

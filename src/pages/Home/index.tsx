@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react';
-import {View, Text, StyleSheet, TextInput, FlatList, ActivityIndicator} from 'react-native';
+import {View, Text, StyleSheet, TextInput, FlatList, ActivityIndicator, Pressable} from 'react-native';
 import {SafeAreaView} from 'react-native-safe-area-context';
 
 import Icon from 'react-native-vector-icons/Feather';
@@ -8,22 +8,31 @@ import {Cards} from '../../components/Cards';
 import {GameCard } from '../../components/GameCard';
 import {CardProps, CaterogiesProps} from '../../types/homeCard.type';
 
+import {StackParamsList} from '../../routes/index';
+import {useNavigation} from '@react-navigation/native';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+
+import useStorage from '../../hooks/useStorage'; 
+
 import api from '../../services/api';
 
+
 export function Home(){
-    const [gameList , setGameList] = useState<CardProps[] | undefined>([]);
-    const [caterogyList , setCategoryList] = useState<CaterogiesProps[] | undefined>([]);
+    const [gameList , setGameList] = useState<CardProps[]>([]);
+    const [caterogyList , setCategoryList] = useState<CaterogiesProps[]>([]);
     const [loading, setLoading] = useState(false);
     const [input, setInput] = useState('');
+
+    const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
 
     useEffect(()=>{
 
         fetchGames();
         fetchCategories();
         
-      }, []);
+    }, []);
 
-      async function fetchGames(){
+    async function fetchGames(){
         try{
             setLoading(true);
             const response = await api.get(`games?page_size=10&key=9234ee884c68423db619251811fb709b`);
@@ -67,11 +76,11 @@ export function Home(){
         }
 
     }
-    
+
     if(loading) {
         return(
             <View style={{
-                flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: "#050B18", marginBottom: 10
+                flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: "#050B18"
             }}>
                 <Text style={styles.logoTitle}>Games<Text style={{color: '#2c8eff'}}>HUB</Text></Text>
                 <ActivityIndicator size='large' color='#2c8eff'/>
@@ -79,14 +88,19 @@ export function Home(){
         )
     }
 
+    function handleSearch(){
+        if(input === '')return;
+        navigation.navigate('Search',{input: input})
+    }
+
     return(
         <SafeAreaView style={styles.container}>
             {/* Parte da Logo e do Icon BookMark */}
             <View style={styles.logoContainer}>
                 <Text style={styles.logoTitle}>Games<Text style={{color: '#2c8eff'}}>HUB</Text></Text>
-                <View style={styles.iconArea}>
+                <Pressable style={styles.iconArea} onPress={()=>navigation.navigate('Favorites')}>
                     <Icon name='bookmark' size={25} color={"#fff"} />
-                </View>
+                </Pressable>
             </View>
 
             {/* Barra de Pesquisa */}
@@ -98,9 +112,12 @@ export function Home(){
                     placeholderTextColor={'#fff'}
                     style={styles.inputArea}
                 />
-                <Icon name='search' size={30} color={"#2c8eff"}
-                    style={{marginLeft: 20}}
-                />
+                <Pressable onPress={handleSearch}>
+                    <Icon name='search' size={30} color={"#2c8eff"}
+                        style={{marginLeft: 20}}
+                    />
+                </Pressable>
+
             </View>
 
             {/* Categorias */}

@@ -5,7 +5,7 @@ import {SafeAreaView} from 'react-native-safe-area-context';
 import Icon from 'react-native-vector-icons/Feather';
 import Icon2 from 'react-native-vector-icons/MaterialIcons'
 
-import {GameDetailsProps, PlatformStoresProps} from '../../types/homeCard.type';
+import {GameDetailsProps, PlatformStoresProps, CardProps} from '../../types/homeCard.type';
 
 import {RouteProp, useRoute, useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
@@ -16,6 +16,8 @@ import {Cards} from '../../components/Cards';
 import {DescriptionModal} from './components/Modal';
 
 import api from '../../services/api';
+
+import useStorage from '../../hooks/useStorage';
 
 type RouteDetailParams = {
     Detail: {
@@ -31,9 +33,11 @@ export function Detail(){
     const route = useRoute<DetailRoutePros>();
     const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
     
-    const [gameList, setGameList] = useState<GameDetailsProps[]>([]);
+    const [gameList, setGameList] = useState<GameDetailsProps>();
     const [modalVisible, setModalVisible] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const {saveItem} = useStorage();
 
     useEffect(()=>{
 
@@ -65,21 +69,23 @@ export function Detail(){
             }
 
             let list = [] as GameDetailsProps[]
+            
+            let aditionalImage = response.data.background_image_additional  ? response.data.background_image_additional : '';
+            
 
-            list.push({
+            setGameList({
                 name: response.data.name,
                 id: response.data.id,
                 description: response.data.description_raw,
                 rating: response.data.rating,
                 background: response.data.background_image,
-                backgroundAdditional: response.data.background_image_additional,
+                backgroundAdditional: aditionalImage,
                 platforms: platformList,
                 stores: storesList,
                 genres: genresList,
                 link: response.data.website
             });
-
-            setGameList(list);
+            console.log(list[0].genres.length);
         }catch(err){
             console.log(err)
         }finally{
@@ -95,10 +101,27 @@ export function Detail(){
         setModalVisible(false);
     }
 
+    function handleSave(){
+        try{
+            if (gameList){
+                const newData : CardProps = {
+                    name: gameList.name,
+                    rating: gameList.rating,
+                    url: gameList.background,
+                    slug: route.params.slug,
+                    id: gameList.id
+                }
+                saveItem(newData);
+            }
+        }catch(err){
+            console.log('Deu erro!');
+        }
+    }
+
     if(loading) {
         return(
             <View style={{
-                flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: "#050B18", marginBottom: 10
+                flex: 1, justifyContent: 'center', alignItems: "center", backgroundColor: "#050B18",
             }}>
                 <ActivityIndicator size='large' color='#2c8eff'/>
             </View>
@@ -114,76 +137,87 @@ export function Detail(){
                     <Pressable style={styles.iconArea} onPress={()=> navigation.goBack()}>
                         <Icon name='arrow-left' size={30} color={"#fff"} />
                     </Pressable>
-                    <Pressable style={styles.iconArea}>
+                    <TouchableOpacity style={styles.iconArea} onPress={handleSave}>
                         <Icon name='bookmark' size={30} color={"#fff"} />
-                    </Pressable>
+                    </TouchableOpacity>
                 </View>
 
                 {/* Scroll de Imagens */}
                 <ScrollView horizontal={true}
                     style={{ flexGrow:0 }}
                 >
-                    <View style={styles.scrollImage}>
-                        {gameList && gameList.length > 0 &&(
-                            <Image
-                                source={{uri: gameList[0].background}}
-                                style={styles.image}
-                            />
-                        )}
-                    </View>
 
-                    <View style={styles.scrollImage}>
-                        {gameList && gameList.length > 0 &&(
+                    {gameList &&(
+                        <View style={[styles.scrollImage, {
+                            width: gameList.backgroundAdditional ?  WidthScreen - 50 : WidthScreen
+                        }]}>
                             <Image
-                                source={{uri: gameList[0].backgroundAdditional}}
+                                source={{uri: gameList.background}}
                                 style={styles.image}
                             />
+                        </View>
+                    )}
+
+
+                        {gameList && gameList.backgroundAdditional && (
+
+                            <View style={styles.scrollImage}>
+                                <Image
+                                    source={{uri: gameList.backgroundAdditional}}
+                                    style={styles.image}
+                                />
+                            </View>
+  
                         )}
-                    </View>
+
                 </ScrollView>
 
                 {/* Open WebSite Icon */}
-                    <Pressable style={styles.websiteArea} 
-                        onPress={()=> openWebSite(gameList[0].link)}
-                    >
-                        <Icon name='airplay' size={27} color={"#fff"} />
-                    </Pressable>
+                    {gameList  && gameList.link && (
+                        <Pressable style={styles.websiteArea} 
+                            onPress={()=> openWebSite(gameList.link)}
+                        >
+                            <Icon name='airplay' size={27} color={"#fff"} />
+                        </Pressable>
+                )}
                 
 
                 <View style={{paddingHorizontal: 10}}>
 
                     {/* Rating  e Name */}
-                    {gameList && gameList.length > 0 && (
+                    {gameList  && (
                         <View style={{marginBottom: 10}}>
                             <View style={{flexDirection: 'row', alignItems: "center", marginTop: 15}}>
                                 <Icon2 name='star' size={25} color="#FABB1E" />
-                                <Text style={styles.title}>{gameList[0].rating}/5</Text>
+                                <Text style={styles.title}>{gameList.rating}/5</Text>
                             </View>
-                            <Text style={styles.title}>{gameList[0].name}</Text>
+                            <Text style={styles.title}>{gameList.name}</Text>
                         </View>
                     )}
 
                     {/* Genres  */}
-                    <Text style={styles.title}>Genres</Text>
-                    {gameList && gameList.length > 0 && gameList[0].genres && (
-                        <FlatList
-                            data={gameList[0].genres}
-                            renderItem={({item}) => (<Cards data={item}/>)}
-                            keyExtractor={item=>item.id}
-                            horizontal
-                            contentContainerStyle={{marginTop: 8, marginBottom: 20}}
-                        />
-                    )}
+                    {gameList && gameList.genres &&
+                        <>
+                            <Text style={styles.title}>Genres</Text>
+                            <FlatList
+                                data={gameList.genres}
+                                renderItem={({item}) => (<Cards data={item}/>)}
+                                keyExtractor={item=>item.id}
+                                horizontal
+                                contentContainerStyle={{marginTop: 8, marginBottom: 20}}
+                            />
+                        </>
+                    }
 
                     {/* Description */}
                     <Text style={styles.title}>Description</Text>
                     <View style={{marginBottom: 15}}>
-                            {gameList && gameList.length > 0 &&gameList[0].description && (
+                            {gameList && gameList.description && (
                                 <Text style={{color:"#ccc"}} 
                                     numberOfLines={5}
                                     ellipsizeMode='tail'
                                 >
-                                    {gameList[0].description}
+                                    {gameList.description}
                                 </Text>
                             )}
                         <TouchableOpacity style={styles.button}
@@ -196,8 +230,8 @@ export function Detail(){
                     {/* Platform  */}
                     <Text style={styles.title}>Platform</Text>
                     <View style={styles.PlatStoreContainer}>
-                            {gameList && gameList.length > 0 && gameList[0].platforms && (
-                                gameList[0].platforms.map((item) => (
+                            {gameList && gameList.platforms && (
+                                gameList.platforms.map((item) => (
                                     <View key={item.id} style={styles.cardsStyle}>
                                         <Cards data={item} color='#0F172A' />
                                     </View>
@@ -208,8 +242,8 @@ export function Detail(){
                     {/* Stores  */}
                     <Text style={styles.title}>Stores</Text>
                     <View style={styles.PlatStoreContainer}>
-                        {gameList && gameList.length > 0 && gameList[0].stores && (
-                            gameList[0].stores.map((item) => (
+                        {gameList && gameList.stores && (
+                            gameList.stores.map((item) => (
                                 <View key={item.id} style={styles.cardsStyle}>
                                     <Cards data={item} color='#0F172A' />
                                 </View>
@@ -223,8 +257,8 @@ export function Detail(){
                     visible={modalVisible}
                     transparent={true}
                 >
-                    {gameList && gameList.length > 0 && gameList[0].description && (
-                        <DescriptionModal description={gameList[0].description} 
+                    {gameList && gameList.description && (
+                        <DescriptionModal description={gameList.description} 
                             closeModal={handleCloseModal}
                         />
                     )}
