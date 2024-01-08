@@ -28,6 +28,7 @@ const useStorage = () => {
                 return;
             }
 
+        
             gameList.push(data);
             await AsyncStorage.setItem(key, JSON.stringify(gameList));
     }

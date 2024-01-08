@@ -6,7 +6,7 @@ import { Detail } from '../pages/Detail';
 import {Search} from '../pages/Search';
 import {Favorites} from '../pages/Favorites';
 
-import {CaterogiesProps, CardProps} from '../types/homeCard.type';
+import {CaterogiesProps} from '../types/homeCard.type';
 
 
 export type StackParamsList = {
@@ -18,7 +18,6 @@ export type StackParamsList = {
 }
 
 const Stack = createNativeStackNavigator<StackParamsList>();
-
 
 export function Routes(){
     return(

@@ -133,7 +133,6 @@ export function Detail(){
         <ScrollView showsVerticalScrollIndicator={false}>
             <SafeAreaView style={styles.container}>
 
-                {/*  Voltar e Salvar */}
                 <View style={styles.iconContainer}>
                     <Pressable style={styles.iconArea} onPress={()=> navigation.goBack()}>
                         <Icon name='arrow-left' size={30} color={"#fff"} />
@@ -143,7 +142,6 @@ export function Detail(){
                     </TouchableOpacity>
                 </View>
 
-                {/* Scroll de Imagens */}
                 <ScrollView horizontal={true}
                     style={{ flexGrow:0 }}
                 >
@@ -173,7 +171,6 @@ export function Detail(){
 
                 </ScrollView>
 
-                {/* Open WebSite Icon */}
                     {gameList  && gameList.link && (
                         <Pressable style={styles.websiteArea} 
                             onPress={()=> openWebSite(gameList.link)}
@@ -185,7 +182,7 @@ export function Detail(){
 
                 <View style={{paddingHorizontal: 10}}>
 
-                    {/* Rating  e Name */}
+
                     {gameList  && (
                         <View style={{marginBottom: 10}}>
                             <View style={{flexDirection: 'row', alignItems: "center", marginTop: 15}}>
@@ -196,7 +193,7 @@ export function Detail(){
                         </View>
                     )}
 
-                    {/* Genres  */}
+
                     {gameList && gameList.genres &&
                         <>
                             <Text style={styles.title}>Genres</Text>
@@ -210,7 +207,7 @@ export function Detail(){
                         </>
                     }
 
-                    {/* Description */}
+
                     <Text style={styles.title}>Description</Text>
                     <View style={{marginBottom: 15}}>
                             {gameList && gameList.description && (
@@ -228,7 +225,7 @@ export function Detail(){
                         </TouchableOpacity>
                     </View>
 
-                    {/* Platform  */}
+
                     <Text style={styles.title}>Platform</Text>
                     <View style={styles.PlatStoreContainer}>
                             {gameList && gameList.platforms && (
@@ -240,7 +237,6 @@ export function Detail(){
                             )}
                     </View>
 
-                    {/* Stores  */}
                     <Text style={styles.title}>Stores</Text>
                     <View style={styles.PlatStoreContainer}>
                         {gameList && gameList.stores && (

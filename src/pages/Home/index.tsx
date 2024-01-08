@@ -12,8 +12,6 @@ import {StackParamsList} from '../../routes/index';
 import {useNavigation} from '@react-navigation/native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 
-import useStorage from '../../hooks/useStorage'; 
-
 import api from '../../services/api';
 
 
