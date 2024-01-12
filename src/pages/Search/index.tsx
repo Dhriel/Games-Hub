@@ -40,7 +40,7 @@ export function Search(){
                 console.log('Nenhum jogo encontrado');
                 setLoading(false);
                 return;
-              }
+            }
 
 
             if(response.data) {
@@ -66,8 +66,6 @@ export function Search(){
         }
     }
 
-
-     
     if(loading) {
         return(
             <View style={{
@@ -90,9 +88,7 @@ export function Search(){
             { errorMessage && (
                 <Text style={{color:"#fff", fontSize: 15, textAlign: "center", marginTop: 20}}>Não encontramos um jogo com esse nome...</Text>
             )}
-        
-
-
+    
             <FlatList
                     data={gameList}
                     keyExtractor={item => item.id}
