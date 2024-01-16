@@ -25,12 +25,12 @@ type RouteDetailParams = {
     }
 }
 
-type DetailRoutePros = RouteProp<RouteDetailParams, 'Detail'>;
+type DetailRouteProps = RouteProp<RouteDetailParams, 'Detail'>;
 
 const WidthScreen = Dimensions.get('window').width;
 
 export function Detail(){
-    const route = useRoute<DetailRoutePros>();
+    const route = useRoute<DetailRouteProps>();
     const navigation = useNavigation<NativeStackNavigationProp<StackParamsList>>();
     const isFocused = useIsFocused();
     

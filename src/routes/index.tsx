@@ -17,6 +17,7 @@ export type StackParamsList = {
     Search: {input: string};
 }
 
+
 const Stack = createNativeStackNavigator<StackParamsList>();
 
 export function Routes(){
